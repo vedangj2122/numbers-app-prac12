@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numbers App</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f7f7f7;
+  }
+
+  section {
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    margin: 0 0 10px 0;
+  }
+
+  input, button {
+    padding: 5px;
+    margin-right: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .operation-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .operation-btn:hover {
+    background-color: #0056b3;
+  }
+
+  #result {
+    padding: 5px;
+    margin-left: 5px;
+    background-color: #e9ecef;
+    display: inline-block;
+    min-width: 60px;
+  }
+</style>
+</head>
+<body>
+  <div class="row" id="login"></div>
+  
+  <section id="arithmetic">
+    <h2>Arithmetic</h2>
+    <input type="number" id="num1" placeholder="Enter a number">
+    <input type="number" id="num2" placeholder="Enter another number">
+    <button class="operation-btn" onclick="sum()">+</button>
+    <button class="operation-btn" onclick="subtract()">−</button>
+    <span id="result"></span>
+  </section>
+
+<section id="prime-check">
+  <h2>Prime check</h2>
+  <input type="number" id="prime-num" placeholder="Number to test">
+  <button onclick="checkPrime()">Check</button>
+  <p id="prime-result"></p>
+</section>
+
+<section id="caesar-cipher">
+  <h2>Caesar Cipher Encode</h2>
+  <input type="text" id="text-to-encode" placeholder="Text to encode">
+  <button onclick="encode()">Encode</button>
+  <p id="cipher-result"></p>
+</section>
+
+
+<script src="config.js"></script>
+<script>
+  let hosts = config.hosts;
+  displayLogin();
+
+  async function checkPrime() {
+    const num = document.getElementById('prime-num').value;
+    const headers = {'Authorization': `Bearer ${config.token}`};
+    try {
+      const response = await fetch(`${hosts.primes}/primes/${num}`, { headers });
+      const result = await response.json();
+      document.getElementById('prime-result').innerText = result.isPrime ? `${num} is a prime number.` : `${num} is not a prime number.`;
+    } catch (error) {
+      document.getElementById('prime-result').innerText = `Error: ${error.message}`;
+    }
+  }
+
+  function encode() {
+    const text = document.getElementById('text-to-encode').value;
+    const shift = 3;
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+      let char = text[i];
+      if (char.match(/[a-z]/i)) {
+        let code = text.charCodeAt(i);
+        if (code >= 65 && code <= 90) {
+          char = String.fromCharCode(((code - 65 + shift) % 26) + 65);
+        } else if (code >= 97 && code <= 122) {
+          char = String.fromCharCode(((code - 97 + shift) % 26) + 97);
+        }
+      }
+      result += char;
+    }
+    document.getElementById('cipher-result').innerText = result;
+  }
+
+  function sum() {
+    const num1 = parseFloat(document.getElementById('num1').value) || 0;
+    const num2 = parseFloat(document.getElementById('num2').value) || 0;
+    document.getElementById('result').innerText = num1 + num2;
+  }
+  
+  function subtract() {
+    const num1 = parseFloat(document.getElementById('num1').value) || 0;
+    const num2 = parseFloat(document.getElementById('num2').value) || 0;
+    document.getElementById('result').innerText = num1 - num2;
+  }
+</script>
+</body>
+</html>
